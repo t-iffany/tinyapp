@@ -26,7 +26,7 @@ app.get('/urls', (req, res) => {
 
 // define the route that will match POST request and handle it
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
+  req.body.longURL = urlDatabase[generateRandomString()];  
   res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
