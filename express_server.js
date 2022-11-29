@@ -16,7 +16,12 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-//second route for url shortened form
+// route to render the urls_new.ejs template to present form to the user
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+// route for url shortened form
 app.get('/urls/:id', (req, res) => {
   const templateVars = {id: req.params.id, longURL: urlDatabase[req.params.id]};
   res.render('urls_show', templateVars);
