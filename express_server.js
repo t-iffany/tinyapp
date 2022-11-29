@@ -5,6 +5,9 @@ const PORT = 8080; // default port 8080
 // set ejs as the view engine
 app.set('view engine', 'ejs');
 
+// body-parser library converts the request body from a Buffer into a readable string
+app.use(express.urlencoded({extended: true}));
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
