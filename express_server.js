@@ -26,8 +26,8 @@ app.get('/urls', (req, res) => {
 
 // define the route that will match POST request and handle it
 app.post("/urls", (req, res) => {
-  req.body.longURL = urlDatabase[generateRandomString()];  
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  req.body.longURL = urlDatabase[generateRandomString()];
+  res.redirect(`/urls/id:`);
 });
 
 // route to render the urls_new.ejs template to present form to the user
