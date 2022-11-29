@@ -19,6 +19,12 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
+// define the route that will match POST request and handle it
+app.post("/urls", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+});
+
 // route to render the urls_new.ejs template to present form to the user
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
