@@ -18,12 +18,22 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// BROWSE - HOMEPAGE
 // route handler for '/urls', use res.render() to pass the URL data to our template
 app.get('/urls', (req, res) => {
   const templateVars = {urls: urlDatabase};
   res.render('urls_index', templateVars);
 });
 
+// ADD
+
+// 'Create New URL' Form for user to fill in
+// route to render the urls_new.ejs template to present form to the user
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+// Takes data submitted into the form and creates new random short URL ID
 // define the route that will match POST request and handle it
 app.post("/urls", (req, res) => {
   const newKey = generateRandomString();
@@ -32,18 +42,13 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${newKey}`);
 });
 
-// route to render the urls_new.ejs template to present form to the user
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
-});
-
-// route for url shortened form
+// route for url shortened form 
 app.get('/urls/:id', (req, res) => {
   const templateVars = {id: req.params.id, longURL: urlDatabase[req.params.id]};
   res.render('urls_show', templateVars);
 });
 
-// route to handle shortURL requests
+// route to handle shortURL requests; when you click on short URL ID, you will be redirected to the longURL
 app.get("/u/:id", (req, res) => {
   // const longURL = ...
   const longURL = urlDatabase[req.params.id];
@@ -61,6 +66,15 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
+});
+
+// EDIT
+
+// DELETE
+// POST route that deletes/removes a URL resource
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect('/urls');
 });
 
 app.listen(PORT, () => {
