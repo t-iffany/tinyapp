@@ -26,8 +26,10 @@ app.get('/urls', (req, res) => {
 
 // define the route that will match POST request and handle it
 app.post("/urls", (req, res) => {
-  req.body.longURL = urlDatabase[generateRandomString()];
-  res.redirect(`/urls/id:`);
+  const newKey = generateRandomString();
+  const newValue = req.body.longURL;  // newValue is random string that = longURL
+  urlDatabase[newKey] = newValue;  // inserting new key-value into object
+  res.redirect(`/urls/${newKey}`);
 });
 
 // route to render the urls_new.ejs template to present form to the user
@@ -40,6 +42,13 @@ app.get('/urls/:id', (req, res) => {
   const templateVars = {id: req.params.id, longURL: urlDatabase[req.params.id]};
   res.render('urls_show', templateVars);
 });
+
+// route to handle shortURL requests
+app.get("/u/:id", (req, res) => {
+  // const longURL = ...
+  const longURL = urlDatabase[req.params.id];
+  res.redirect(longURL);
+}); 
 
 app.get("/", (req, res) => {
   res.send("Hello!");
