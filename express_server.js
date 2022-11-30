@@ -10,6 +10,9 @@ function generateRandomString () {
 // set ejs as the view engine
 app.set('view engine', 'ejs');
 
+// Middleware
+// takes form data and putting it into req.body
+// extended = false uses standard values ; extended = true uses non-standard values
 // body-parser library converts the request body from a Buffer into a readable string
 app.use(express.urlencoded({extended: true}));
 
@@ -22,14 +25,10 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-// BROWSE - HOMEPAGE
-// route handler for '/urls', use res.render() to pass the URL data to our template
-app.get('/urls', (req, res) => {
-  const templateVars = {urls: urlDatabase};
-  res.render('urls_index', templateVars);
-});
+// ROUTES
 
 // ADD
+
 
 // 'Create New URL' Form for user to fill in
 // route to render the urls_new.ejs template to present form to the user
@@ -37,14 +36,6 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-// Takes data submitted into the form and creates new random short URL ID
-// define the route that will match POST request and handle it
-app.post("/urls", (req, res) => {
-  const newKey = generateRandomString();
-  const newValue = req.body.longURL;  // newValue is random string that = longURL
-  urlDatabase[newKey] = newValue;  // inserting new key-value into object
-  res.redirect(`/urls/${newKey}`);
-});
 
 // route for url shortened form 
 app.get('/urls/:id', (req, res) => {
@@ -54,16 +45,16 @@ app.get('/urls/:id', (req, res) => {
 
 // route to handle shortURL requests; when you click on short URL ID, you will be redirected to the longURL
 app.get("/u/:id", (req, res) => {
-  // const longURL = ...
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 }); 
 
+// homepage
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.send("Hello! Homepage");
 });
 
-// output JSON string representing the entire urlDatabse object
+// output JSON string representing the entire urlDatabase object
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
@@ -72,12 +63,12 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-// UPDATE/EDIT
+// EDIT
 // POST route that updates a URL resource and have it update the value of your stored long URL
 app.post("/urls/:id", (req, res) => {
   const newID = req.params.id;
   urlDatabase[newID] = req.body.newURL;
-  res.redirect('/urls');
+  res.redirect(`/urls`);
 });
 
 // DELETE
@@ -86,6 +77,28 @@ app.post("/urls/:id/delete", (req, res) => {
   const idToDelete = req.params.id
   delete urlDatabase[idToDelete];
   res.redirect('/urls');
+});
+
+// BROWSE - HOMEPAGE
+// route handler for '/urls', use res.render() to pass the URL data to our template
+app.get('/urls', (req, res) => {
+  const templateVars = {urls: urlDatabase};
+  res.render('urls_index', templateVars);
+});
+
+// Takes data submitted into the form and creates new random short URL ID
+app.post("/urls", (req, res) => {
+  const newKey = generateRandomString();
+  const newValue = req.body.longURL;  // newValue is random string that = longURL
+  urlDatabase[newKey] = newValue;  // inserting new key-value into object
+  res.redirect(`/urls/${newKey}`);
+});
+
+// endpoint to handle a POST to /login
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie("username", username);
+  res.redirect("/urls");
 });
 
 app.listen(PORT, () => {

@@ -34,6 +34,7 @@
             <tr>
               <td><%= id %></td>
               <td><%= urls[id] %></td>
+              
               <!-- Edit button -->
               <td><form method="GET" action="/urls/<%= id %>">
                 <button type="submit" style="color:blue; background-color:white; border-color:blue" class="btn btn-primary">Edit</button>
@@ -49,7 +50,7 @@
         </tbody>
       </table>  
       <!-- add a link for shortening a new url -->
-      <a href='/urls/new'>Create New URL</a>
+      <!-- <a href='/urls/new'>Create New URL</a> -->
     </main>
     <!-- Bootstrap JS -->
     <script
