@@ -25,6 +25,26 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  sampleUser: {
+    id: '',
+    email: '',
+    password: '',
+  },
+
+  userRandomID: {
+    id: 'userRandomID',
+    email: 'user@example.com',
+    password: 'pizzapw',
+  },
+  user2RandomID: {
+    id: 'user2RandomID',
+    email: 'user2@example.com',
+    password: 'chocolatepw',
+  },
+};
+
+
 // ROUTES
 
 // ADD
@@ -104,6 +124,21 @@ app.post("/urls", (req, res) => {
 // GET /register endpoint which returns registration template
 app.get("/register", (req, res) => {
   res.render('urls_registration');
+});
+
+// POST /register endpoint to handle registration form data
+app.post("/register", (req, res) => {
+  const enteredEmail = req.body.email;
+  const enteredPassword = req.body.password;
+  const newUserID = generateRandomString();
+  users[newUserID] = {
+    id: newUserID,
+    email: enteredEmail,
+    password: enteredPassword
+  };
+  res.cookie("user_id", newUserID);
+  console.log('object data:', users[newUserID]);
+  res.redirect("/urls");
 });
 
 // endpoint to handle a POST to /login
