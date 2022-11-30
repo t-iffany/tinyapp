@@ -20,8 +20,16 @@
       <div class="card-body">
         <h5 class="card-title">TinyURL for: <%= longURL %></h5>
         <p class="card-text">
+                                <!-- links to the long link website -->
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
         </p>
+        <!-- Add Edit form and button-->
+        <h4>Edit</h4>
+        <form method="POST" action="/urls/<%= id %>">
+          <label for="newURL">New URL:</label>
+          <input type="text" name="newURL" placeholder="http://" size="60">
+          <button type ="submit" class="btn btn-primary">Submit</button>
+        </form>
       </div>
       <div class="card-footer text-muted"></div>
     </div>

@@ -68,12 +68,19 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-// EDIT
+// UPDATE/EDIT
+// POST route that updates a URL resource and have it update the value of your stored long URL
+app.post("/urls/:id", (req, res) => {
+  const newID = req.params.id;
+  urlDatabase[newID] = req.body.newURL;
+  res.redirect('/urls');
+});
 
 // DELETE
 // POST route that deletes/removes a URL resource
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
+  const idToDelete = req.params.id
+  delete urlDatabase[idToDelete];
   res.redirect('/urls');
 });
 
