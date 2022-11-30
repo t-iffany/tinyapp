@@ -101,6 +101,11 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${newKey}`);
 });
 
+// GET /register endpoint which returns registration template
+app.get("/register", (req, res) => {
+  res.render('urls_registration');
+});
+
 // endpoint to handle a POST to /login
 app.post("/login", (req, res) => {
   const username = req.body.username;
