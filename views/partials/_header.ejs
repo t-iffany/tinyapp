@@ -1,15 +1,8 @@
 <header>
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
     <a class="navbar-brand" href="/urls">TinyApp</a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-toggle="collapse"
-      data-target="#navbarNavAltMarkup"
-      aria-controls="navbarNavAltMarkup"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
@@ -18,10 +11,18 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-    <form method="POST" action="/login">
-      <label>Logged in as: <%= username %></label>
-      <input class="form-center" type="text" name="username" placeholder="Username" size="20">
-      <button type ="submit" style="background-color:transparent; color:black; border-color: black" class="btn btn-primary">Login</button>
-    </form>
-    </nav>
+
+    <% if (username) { %>
+      <form method="POST" action="/logout">
+        <label>Logged in as: <%= username %></label>
+        <button type="submit">Logout</button>
+      </form>
+      <% } else { %>
+        <form method="POST" action="/login">
+          <input class="form-center" type="text" name="username" placeholder="Username" size="20">
+          <button type="submit" style="background-color:transparent; color:black; border-color: black"
+            class="btn btn-primary">Login</button>
+        </form>
+        <% } %>
+  </nav>
 </header>
