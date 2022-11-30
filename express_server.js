@@ -39,7 +39,11 @@ app.get("/urls/new", (req, res) => {
 
 // route for url shortened form 
 app.get('/urls/:id', (req, res) => {
-  const templateVars = {id: req.params.id, longURL: urlDatabase[req.params.id]};
+  const templateVars = {
+    id: req.params.id, 
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies['username']
+  };
   res.render('urls_show', templateVars);
 });
 
@@ -82,7 +86,10 @@ app.post("/urls/:id/delete", (req, res) => {
 // BROWSE - HOMEPAGE
 // route handler for '/urls', use res.render() to pass the URL data to our template
 app.get('/urls', (req, res) => {
-  const templateVars = {urls: urlDatabase};
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies['username']
+  };
   res.render('urls_index', templateVars);
 });
 
