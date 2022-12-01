@@ -155,6 +155,11 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
+// GET /login endpoint which returns login template
+app.get("/login", (req, res) => {
+  res.render('urls_login');
+})
+
 // endpoint to handle a POST to /login
 app.post("/login", (req, res) => {
   const user = users[req.body['user_id']];
