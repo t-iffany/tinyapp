@@ -82,6 +82,10 @@ app.get('/urls/:id', (req, res) => {
 // route to handle shortURL requests; when you click on short URL ID, you will be redirected to the longURL
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
+  // if short URL ID does not exist (:id is not in the database)
+  if (longURL === undefined) {
+    return res.send('Short URL ID does not exist');
+  }
   return res.redirect(longURL);
 });
 
