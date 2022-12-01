@@ -57,7 +57,11 @@ const users = {
 // 'Create New URL' Form for user to fill in
 // route to render the urls_new.ejs template to present form to the user
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    urls: urlDatabase,
+    user: users[req.cookies['user_id']]
+  };
+  res.render('urls_new', templateVars);
 });
 
 
