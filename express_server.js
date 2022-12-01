@@ -31,8 +31,16 @@ function ifEmailExists(email) {
 };
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  // change structure of urlDatabse so id(ie. b2xVn2) stays as key, its value becomes an object that has longURL and userID keys
+  b2xVn2: {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "userRandomID"
+  },
+
+  s9m5xK: {
+    longURL: "http://www.google.com",
+    userID: "user2RandomID"
+  },
 };
 
 const users = {
@@ -73,7 +81,7 @@ app.get("/urls/new", (req, res) => {
 app.get('/urls/:id', (req, res) => {
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user: users[req.cookies['user_id']]
   };
   return res.render('urls_show', templateVars);
@@ -81,7 +89,7 @@ app.get('/urls/:id', (req, res) => {
 
 // route to handle shortURL requests; when you click on short URL ID, you will be redirected to the longURL
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  const longURL = urlDatabase[req.params.id].longURL;
   // if short URL ID does not exist (:id is not in the database)
   if (longURL === undefined) {
     return res.send('Short URL ID does not exist');
@@ -134,9 +142,11 @@ app.post("/urls", (req, res) => {
   if (!req.cookies['user_id']) {
     return res.send('Please log in to shorten URLs');
   };
-  const newKey = generateRandomString();
-  const newValue = req.body.longURL;  // newValue is random string that = longURL
-  urlDatabase[newKey] = newValue;  // inserting new key-value into object
+  const newKey = generateRandomString();    // newKey is newly generated short URL ID
+  urlDatabase[newKey] = {        // new short URL ID now an object with values longURL and cooke with user_id
+    longURL: req.body.longURL,
+    userID: req.cookies['user_id'],
+  };
   return res.redirect(`/urls/${newKey}`);
 });
 
@@ -199,6 +209,7 @@ app.post("/login", (req, res) => {
   } else {
     // error if enteredPassword is not same as password registered to that userID
     const existingUserID = ifEmailExists(enteredEmail);
+
     if (enteredPassword !== users[existingUserID].password) {
       return res.status(403).send("Incorrect password");
 
