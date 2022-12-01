@@ -61,7 +61,7 @@ app.get("/urls/new", (req, res) => {
     urls: urlDatabase,
     user: users[req.cookies['user_id']]
   };
-
+  // if user is not logged in, redirect to GET /login
   if (!req.cookies['user_id']) {
     return res.redirect('/login');
   }
@@ -127,6 +127,9 @@ app.get('/urls', (req, res) => {
 
 // Takes data submitted into the form and creates new random short URL ID
 app.post("/urls", (req, res) => {
+  if (!req.cookies['user_id']) {
+    return res.send('Please log in to shorten URLs');
+  };
   const newKey = generateRandomString();
   const newValue = req.body.longURL;  // newValue is random string that = longURL
   urlDatabase[newKey] = newValue;  // inserting new key-value into object
