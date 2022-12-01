@@ -91,14 +91,21 @@ app.get("/urls/new", (req, res) => {
 
 // route for url shortened form 
 app.get('/urls/:id', (req, res) => {
+  const shortURL = req.params.id;
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL,
+    longURL: urlDatabase[shortURL].longURL,
     user: users[req.cookies['user_id']]
   };
   // if user is not logged in, return error message
   if (!req.cookies['user_id']) {
     return res.send("This page is not accessible. You are not logged in.");
+  }
+  // if user do not own the URL page, it should not be accessible, return error message
+  const existingUserUrls = urlsForUser(req.cookies['user_id']);
+  // does this object have the key of the short URL
+  if (!existingUserUrls[req.params.id]) {
+    return res.send("This page does not belong to your user account");
   }
   return res.render('urls_show', templateVars);
 });
