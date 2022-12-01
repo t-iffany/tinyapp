@@ -61,6 +61,10 @@ app.get("/urls/new", (req, res) => {
     urls: urlDatabase,
     user: users[req.cookies['user_id']]
   };
+
+  if (!req.cookies['user_id']) {
+    return res.redirect('/login');
+  }
   return res.render('urls_new', templateVars);
 });
 
