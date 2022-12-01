@@ -137,6 +137,23 @@ app.get("/hello", (req, res) => {
 // EDIT
 // POST route that updates a URL resource and have it update the value of your stored long URL
 app.post("/urls/:id", (req, res) => {
+
+  // if short URL ID does not exist
+  const shortURL = req.params.id;
+  if (!urlDatabase[shortURL]) {
+    return res.send('Short URL ID does not exist');
+  };
+
+  // if user is not logged in
+  if (!req.cookies['user_id']) {
+    return res.send('You are not logged in');
+  };
+
+  // if user does not own the URL
+  if (!userUrls[req.params.id]) {
+    return res.send("This page does not belong to your user account");
+  };
+
   const newID = req.params.id;
   urlDatabase[newID] = req.body.newURL;
   return res.redirect(`/urls`);
