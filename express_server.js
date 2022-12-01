@@ -61,7 +61,7 @@ app.get("/urls/new", (req, res) => {
     urls: urlDatabase,
     user: users[req.cookies['user_id']]
   };
-  res.render('urls_new', templateVars);
+  return res.render('urls_new', templateVars);
 });
 
 
@@ -72,28 +72,27 @@ app.get('/urls/:id', (req, res) => {
     longURL: urlDatabase[req.params.id],
     user: users[req.cookies['user_id']]
   };
-  res.render('urls_show', templateVars);
+  return res.render('urls_show', templateVars);
 });
 
 // route to handle shortURL requests; when you click on short URL ID, you will be redirected to the longURL
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
-  res.redirect(longURL);
+  return res.redirect(longURL);
 });
 
 // homepage
 app.get("/", (req, res) => {
-  res.send("Hello! Homepage");
+  return res.send("Hello! Homepage");
 });
 
 // output JSON string representing the entire urlDatabase object
 app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+  return res.json(urlDatabase);
 });
 
 app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-  return;
+  return res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 // EDIT
@@ -101,7 +100,7 @@ app.get("/hello", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const newID = req.params.id;
   urlDatabase[newID] = req.body.newURL;
-  res.redirect(`/urls`);
+  return res.redirect(`/urls`);
 });
 
 // DELETE
@@ -109,7 +108,7 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const idToDelete = req.params.id;
   delete urlDatabase[idToDelete];
-  res.redirect('/urls');
+  return res.redirect('/urls');
 });
 
 // BROWSE - HOMEPAGE
@@ -119,7 +118,7 @@ app.get('/urls', (req, res) => {
     urls: urlDatabase,
     user: users[req.cookies['user_id']]
   };
-  res.render('urls_index', templateVars);
+  return res.render('urls_index', templateVars);
 });
 
 // Takes data submitted into the form and creates new random short URL ID
@@ -127,15 +126,19 @@ app.post("/urls", (req, res) => {
   const newKey = generateRandomString();
   const newValue = req.body.longURL;  // newValue is random string that = longURL
   urlDatabase[newKey] = newValue;  // inserting new key-value into object
-  res.redirect(`/urls/${newKey}`);
+  return res.redirect(`/urls/${newKey}`);
 });
 
 // GET /register endpoint which returns registration template
 app.get("/register", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies['user_id']]
+  };
+  // if user is logged in, should redirect to GET /urls
   if (!req.cookies['user_id']) {
-  res.render('urls_registration');
+    return res.render('urls_registration', templateVars);
   }
-  res.redirect('/urls');
+  return res.redirect('/urls');
 });
 
 // POST /register endpoint to handle registration form data
@@ -144,11 +147,11 @@ app.post("/register", (req, res) => {
   const enteredPassword = req.body.password;
 
   if (!enteredEmail || !enteredPassword) {
-    res.status(400).send("Please enter a valid email and password");
+    return res.status(400).send("Please enter a valid email and password");
   };
 
   if (ifEmailExists(enteredEmail)) {
-    res.status(400).send("Account with this email already exists");
+    return res.status(400).send("Account with this email already exists");
   };
 
   const newUserID = generateRandomString();
@@ -159,16 +162,19 @@ app.post("/register", (req, res) => {
   };
 
   res.cookie("user_id", newUserID);
-  res.redirect("/urls");
+  return res.redirect("/urls");
 });
 
 // GET /login endpoint which returns login template
 app.get("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies['user_id']]
+  };
   // if user is logged in, should redirect to GET /urls
   if (!req.cookies['user_id']) {
-    res.render('urls_login');
+    return res.render('urls_login', templateVars);
   }
-  res.redirect('/urls');
+  return res.redirect('/urls');
 });
 
 // endpoint to handle a POST to /login
@@ -177,18 +183,18 @@ app.post("/login", (req, res) => {
   const enteredPassword = req.body.password;
   // error if email is not currently registered
   if (!ifEmailExists(enteredEmail)) {
-    res.status(403).send("User with that email cannot be found");
+    return res.status(403).send("User with that email cannot be found");
 
   } else {
     // error if enteredPassword is not same as password registered to that userID
     const existingUserID = ifEmailExists(enteredEmail);
     if (enteredPassword !== users[existingUserID].password) {
-      res.status(403).send("Incorrect password");
+      return res.status(403).send("Incorrect password");
 
     } else {
       // if email exists and passwords match, set cookie to the user id
       res.cookie("user_id", existingUserID);
-      res.redirect("/urls");
+      return res.redirect("/urls");
     }
   }
 });
@@ -196,7 +202,7 @@ app.post("/login", (req, res) => {
 // endpoint to handle a POST to /logout
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
-  res.redirect('/login');
+  return res.redirect('/login');
 });
 
 app.listen(PORT, () => {
