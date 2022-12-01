@@ -2,11 +2,6 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
-// Implement function that returns a string of 6 random alphanumeric characters
-function generateRandomString () {
-  return Math.random().toString(36).substr(2, 6);
-};
-
 // set ejs as the view engine
 app.set('view engine', 'ejs');
 
@@ -20,18 +15,27 @@ app.use(express.urlencoded({extended: true}));
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
+// Implement function that returns a string of 6 random alphanumeric characters
+function generateRandomString () {
+  return Math.random().toString(36).substr(2, 6);
+};
+
+// Implement a function to check if email already exists. It takes an email as a parameter and return either the entire user object or null if not found
+function ifUserExists (email) {
+  for (const user in users) {
+    if (email === users[user].email) {
+      return true;
+    };
+  };
+  return false;
+};
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
 const users = {
-  sampleUser: {
-    id: '',
-    email: '',
-    password: '',
-  },
-
   userRandomID: {
     id: 'userRandomID',
     email: 'user@example.com',
@@ -130,12 +134,22 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const enteredEmail = req.body.email;
   const enteredPassword = req.body.password;
+
+  if (!enteredEmail || !enteredPassword) {
+    res.send(400, "Please enter a valid email and password");
+  };
+
+  if (ifUserExists(enteredEmail)) {
+    res.send(400, "Account with this email already exists");
+  };
+
   const newUserID = generateRandomString();
   users[newUserID] = {
     id: newUserID,
     email: enteredEmail,
     password: enteredPassword
   };
+
   res.cookie("user_id", newUserID);
   console.log('object data:', users[newUserID]);
   res.redirect("/urls");
