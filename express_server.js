@@ -93,6 +93,7 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
+  return;
 });
 
 // EDIT
@@ -131,7 +132,10 @@ app.post("/urls", (req, res) => {
 
 // GET /register endpoint which returns registration template
 app.get("/register", (req, res) => {
+  if (!req.cookies['user_id']) {
   res.render('urls_registration');
+  }
+  res.redirect('/urls');
 });
 
 // POST /register endpoint to handle registration form data
@@ -160,7 +164,11 @@ app.post("/register", (req, res) => {
 
 // GET /login endpoint which returns login template
 app.get("/login", (req, res) => {
-  res.render('urls_login');
+  // if user is logged in, should redirect to GET /urls
+  if (!req.cookies['user_id']) {
+    res.render('urls_login');
+  }
+  res.redirect('/urls');
 });
 
 // endpoint to handle a POST to /login
