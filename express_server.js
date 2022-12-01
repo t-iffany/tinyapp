@@ -184,7 +184,7 @@ app.post("/login", (req, res) => {
 // endpoint to handle a POST to /logout
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 
 app.listen(PORT, () => {
