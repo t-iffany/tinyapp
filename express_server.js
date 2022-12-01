@@ -30,6 +30,18 @@ function ifEmailExists(email) {
   return false;
 };
 
+// function which returns the URLs where the userID is equal to the id of the currently logged-in user
+function urlsForUser(id) {
+  // userUrls will be an object that has the urls matched to the correct id
+  const userUrls = {};
+  for (const shortUrlId in urlDatabase) {
+    if(urlDatabase[shortUrlId].userID === id) {
+      userUrls[shortUrlId] = urlDatabase[shortUrlId];
+    }
+  }
+  return userUrls;
+};
+
 const urlDatabase = {
   // change structure of urlDatabse so id(ie. b2xVn2) stays as key, its value becomes an object that has longURL and userID keys
   b2xVn2: {
