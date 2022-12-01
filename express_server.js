@@ -102,9 +102,9 @@ app.get('/urls/:id', (req, res) => {
     return res.send("This page is not accessible. You are not logged in.");
   }
   // if user do not own the URL page, it should not be accessible, return error message
-  const existingUserUrls = urlsForUser(req.cookies['user_id']);
+  const userUrls = urlsForUser(req.cookies['user_id']);
   // does this object have the key of the short URL
-  if (!existingUserUrls[req.params.id]) {
+  if (!userUrls[req.params.id]) {
     return res.send("This page does not belong to your user account");
   }
   return res.render('urls_show', templateVars);
@@ -154,7 +154,7 @@ app.post("/urls/:id/delete", (req, res) => {
 // route handler for '/urls', use res.render() to pass the URL data to our template
 app.get('/urls', (req, res) => {
   const templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(req.cookies['user_id']),     // updated from urls: urlsDatabase 
     user: users[req.cookies['user_id']]
   };
   // if user is not logged in, return error message 
@@ -169,6 +169,7 @@ app.post("/urls", (req, res) => {
   if (!req.cookies['user_id']) {
     return res.send('Please log in to shorten URLs');
   };
+  
   const newKey = generateRandomString();    // newKey is newly generated short URL ID
   urlDatabase[newKey] = {        // new short URL ID now an object with values longURL and cooke with user_id
     longURL: req.body.longURL,
