@@ -96,6 +96,10 @@ app.get('/urls/:id', (req, res) => {
     longURL: urlDatabase[req.params.id].longURL,
     user: users[req.cookies['user_id']]
   };
+  // if user is not logged in, return error message
+  if (!req.cookies['user_id']) {
+    return res.send("This page is not accessible. You are not logged in.");
+  }
   return res.render('urls_show', templateVars);
 });
 
