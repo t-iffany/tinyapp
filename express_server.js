@@ -134,6 +134,10 @@ app.get('/urls', (req, res) => {
     urls: urlDatabase,
     user: users[req.cookies['user_id']]
   };
+  // if user is not logged in, return error message 
+  if (!req.cookies['user_id']) {
+    return res.send('You are not logged in');
+  }
   return res.render('urls_index', templateVars);
 });
 
