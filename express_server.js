@@ -15,8 +15,14 @@ app.use(express.urlencoded({ extended: true }));
 const bcrypt = require('bcryptjs');
 
 //cookie-parser serves as Express middleware that helps us read the values from the cookie
-const cookieParser = require("cookie-parser");
-app.use(cookieParser());
+//cookie-session serves as cookie-parser and also encrypts our cookies
+const cookieSession = require("cookie-session");
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2'],
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 
 // Implement function that returns a string of 6 random alphanumeric characters
 function generateRandomString() {
@@ -82,10 +88,10 @@ const users = {
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    user: users[req.cookies['user_id']]
+    user: users[req.session.user_id]
   };
   // if user is not logged in, redirect to GET /login
-  if (!req.cookies['user_id']) {
+  if (!req.session.user_id) {
     return res.redirect('/login');
   }
   return res.render('urls_new', templateVars);
@@ -98,14 +104,14 @@ app.get('/urls/:id', (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[shortURL].longURL,
-    user: users[req.cookies['user_id']]
+    user: users[req.session.user_id]
   };
   // if user is not logged in, return error message
-  if (!req.cookies['user_id']) {
+  if (!req.session.user_id) {
     return res.send("This page is not accessible. You are not logged in.");
   }
   // if user do not own the URL page, it should not be accessible, return error message
-  const userUrls = urlsForUser(req.cookies['user_id']);
+  const userUrls = urlsForUser(req.session.user_id);
   // does this object have the key of the short URL
   if (!userUrls[req.params.id]) {
     return res.send("This page does not belong to your user account");
@@ -148,12 +154,12 @@ app.post("/urls/:id", (req, res) => {
   };
 
   // if user is not logged in
-  if (!req.cookies['user_id']) {
+  if (!req.session.user_id) {
     return res.send('You are not logged in and cannot edit');
   };
 
   // if user does not own the URL
-  const userUrls = urlsForUser(req.cookies['user_id']);
+  const userUrls = urlsForUser(req.session.user_id);
   if (!userUrls[req.params.id]) {
     return res.send("This page does not belong to your user account and you cannot edit");
   };
@@ -174,12 +180,12 @@ app.post("/urls/:id/delete", (req, res) => {
   };
 
   // if user is not logged in
-  if (!req.cookies['user_id']) {
+  if (!req.session.user_id) {
     return res.send('You are not logged in and cannot delete');
   };
 
   // if logged in AND user does not own the URL
-  const userUrls = urlsForUser(req.cookies['user_id']);
+  const userUrls = urlsForUser(req.session.user_id);
   if (!userUrls[req.params.id]) {
     return res.send("This page does not belong to your user account and you cannot delete");
   };
@@ -194,11 +200,11 @@ app.post("/urls/:id/delete", (req, res) => {
 // route handler for '/urls', use res.render() to pass the URL data to our template
 app.get('/urls', (req, res) => {
   const templateVars = {
-    urls: urlsForUser(req.cookies['user_id']),     // updated from urls: urlsDatabase 
-    user: users[req.cookies['user_id']]
+    urls: urlsForUser(req.session.user_id),     // updated from urls: urlsDatabase 
+    user: users[req.session.user_id]
   };
   // if user is not logged in, return error message 
-  if (!req.cookies['user_id']) {
+  if (!req.session.user_id) {
     return res.send('You are not logged in');
   }
   return res.render('urls_index', templateVars);
@@ -206,14 +212,14 @@ app.get('/urls', (req, res) => {
 
 // Takes data submitted into the form and creates new random short URL ID
 app.post("/urls", (req, res) => {
-  if (!req.cookies['user_id']) {
+  if (!req.session.user_id) {
     return res.send('Please log in to shorten URLs');
   };
   
   const newKey = generateRandomString();    // newKey is newly generated short URL ID
   urlDatabase[newKey] = {        // new short URL ID now an object with values longURL and cooke with user_id
     longURL: req.body.longURL,
-    userID: req.cookies['user_id'],
+    userID: req.session.user_id,
   };
   return res.redirect(`/urls/${newKey}`);
 });
@@ -221,10 +227,10 @@ app.post("/urls", (req, res) => {
 // GET /register endpoint which returns registration template
 app.get("/register", (req, res) => {
   const templateVars = {
-    user: users[req.cookies['user_id']]
+    user: users[req.session.user_id]
   };
   // if user is logged in, should redirect to GET /urls
-  if (!req.cookies['user_id']) {
+  if (!req.session.user_id) {
     return res.render('urls_registration', templateVars);
   }
   return res.redirect('/urls');
@@ -251,7 +257,8 @@ app.post("/register", (req, res) => {
     password: hashedPassword
   };
 
-  res.cookie("user_id", newUserID);
+  //res.cookie("user_id", newUserID);
+  req.session.user_id = newUserID;
   return res.redirect("/urls");
 });
 
@@ -259,10 +266,10 @@ app.post("/register", (req, res) => {
 // GET /login endpoint which returns login template
 app.get("/login", (req, res) => {
   const templateVars = {
-    user: users[req.cookies['user_id']]
+    user: users[req.session.user_id]
   };
   // if user is logged in, should redirect to GET /urls
-  if (!req.cookies['user_id']) {
+  if (!req.session.user_id) {
     return res.render('urls_login', templateVars);
   }
   return res.redirect('/urls');
@@ -287,7 +294,8 @@ app.post("/login", (req, res) => {
     
     } else {
       //if email exists and passwords match, set cookie to the user id
-      res.cookie("user_id", existingUserID);
+      //res.cookie("user_id", existingUserID);
+      req.session.user_id = existingUserID;
       return res.redirect("/urls");
     }
   }
@@ -295,7 +303,8 @@ app.post("/login", (req, res) => {
 
 // endpoint to handle a POST to /logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  //res.clearCookie('user_id');
+  req.session = null;
   return res.redirect('/login');
 });
 
