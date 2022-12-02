@@ -279,7 +279,7 @@ app.get("/login", (req, res) => {
     user: usersDatabase[req.session.user_id]
   };
   // if user is logged in, should redirect to GET /urls
-  if (!req.session.user_id) {
+  if (!usersDatabase[req.session.user_id]) {
     return res.render('urls_login', templateVars);
   }
   return res.redirect('/urls');
