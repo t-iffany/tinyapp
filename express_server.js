@@ -38,7 +38,7 @@ function urlsForUser(id) {
   // userUrls will be an object that has the urls matched to the correct id
   const userUrls = {};
   for (const shortUrlId in urlDatabase) {
-    if(urlDatabase[shortUrlId].userID === id) {
+    if (urlDatabase[shortUrlId].userID === id) {
       userUrls[shortUrlId] = urlDatabase[shortUrlId];
     }
   }
@@ -214,7 +214,7 @@ app.post("/urls", (req, res) => {
   if (!usersDatabase[req.session.user_id]) {
     return res.send('Please log in to shorten URLs');
   };
-  
+
   const newKey = generateRandomString();    // newKey is newly generated short URL ID
   urlDatabase[newKey] = {        // new short URL ID now an object with values longURL and cooke with user_id
     longURL: req.body.longURL,
@@ -289,7 +289,7 @@ app.post("/login", (req, res) => {
     //if (enteredPassword !== users[existingUserID].password) {
     if (!bcrypt.compareSync(enteredPassword, usersDatabase[existingUser.id].password)) {
       return res.status(403).send("Incorrect password");
-    
+
     } else {
       //if email exists and passwords match, set cookie to the user id
       //res.cookie("user_id", existingUserID);
