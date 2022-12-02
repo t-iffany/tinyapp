@@ -165,7 +165,6 @@ app.post("/urls/:id", (req, res) => {
 
   const newID = req.params.id;
   urlDatabase[newID].longURL = req.body.newURL;
-  console.log(urlDatabase)
   res.redirect(`/urls`);
 });
 
