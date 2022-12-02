@@ -62,12 +62,12 @@ const users = {
   userRandomID: {
     id: 'userRandomID',
     email: 'user@example.com',
-    password: 'pizzapw',
+    password: 'pw1',
   },
   user2RandomID: {
     id: 'user2RandomID',
     email: 'user2@example.com',
-    password: 'chocolatepw',
+    password: 'pw2',
   },
 };
 
@@ -248,12 +248,13 @@ app.post("/register", (req, res) => {
   users[newUserID] = {
     id: newUserID,
     email: enteredEmail,
-    password: enteredPassword
+    password: hashedPassword
   };
 
   res.cookie("user_id", newUserID);
   return res.redirect("/urls");
 });
+
 
 // GET /login endpoint which returns login template
 app.get("/login", (req, res) => {
@@ -271,6 +272,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const enteredEmail = req.body.email;
   const enteredPassword = req.body.password;
+
   // error if email is not currently registered
   if (!ifEmailExists(enteredEmail)) {
     return res.status(403).send("User with that email cannot be found");
@@ -279,11 +281,12 @@ app.post("/login", (req, res) => {
     // error if enteredPassword is not same as password registered to that userID
     const existingUserID = ifEmailExists(enteredEmail);
 
-    if (enteredPassword !== users[existingUserID].password) {
+    //if (enteredPassword !== users[existingUserID].password) {
+    if (!bcrypt.compareSync(enteredPassword, users[existingUserID].password)) {
       return res.status(403).send("Incorrect password");
-
+    
     } else {
-      // if email exists and passwords match, set cookie to the user id
+      //if email exists and passwords match, set cookie to the user id
       res.cookie("user_id", existingUserID);
       return res.redirect("/urls");
     }
