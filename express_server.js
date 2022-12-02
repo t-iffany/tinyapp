@@ -11,7 +11,10 @@ app.set('view engine', 'ejs');
 // body-parser library converts the request body from a Buffer into a readable string
 app.use(express.urlencoded({ extended: true }));
 
-// cookie-parser serves as Express middleware that helps us read the values from the cookie
+// Use bcrypt to store passwords
+const bcrypt = require('bcryptjs');
+
+//cookie-parser serves as Express middleware that helps us read the values from the cookie
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
@@ -231,6 +234,7 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const enteredEmail = req.body.email;
   const enteredPassword = req.body.password;
+  const hashedPassword = bcrypt.hashSync(enteredPassword, 10);
 
   if (!enteredEmail || !enteredPassword) {
     return res.status(400).send("Please enter a valid email and password");
