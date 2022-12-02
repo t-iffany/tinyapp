@@ -31,12 +31,21 @@ function generateRandomString() {
 
 // Implement a function to check if email already exists. It takes an email as a parameter and return either the entire user object or null if not found
 function ifEmailExists(email) {
-  for (const user in users) {
-    if (email === users[user].email) {
-      return users[user].id;
+  for (const user in usersDatabase) {
+    if (email === usersDatabase[user].email) {
+      return usersDatabase[user].id;
     };
   };
   return false;
+};
+
+// Implement a function to look up users by their email from our users database. Takes in parameter email and our user database
+const getUserByEmail = function(email, usersDatabase) {
+  for (const user in usersDatabase) {
+    if (usersDatabase[user].email === email) {
+      return usersDatabase[user];
+    }
+  }
 };
 
 // function which returns the URLs where the userID is equal to the id of the currently logged-in user
@@ -64,7 +73,7 @@ const urlDatabase = {
   },
 };
 
-const users = {
+const usersDatabase = {
   userRandomID: {
     id: 'userRandomID',
     email: 'user@example.com',
@@ -88,7 +97,7 @@ const users = {
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    user: users[req.session.user_id]
+    user: usersDatabase[req.session.user_id]
   };
   // if user is not logged in, redirect to GET /login
   if (!req.session.user_id) {
@@ -104,7 +113,7 @@ app.get('/urls/:id', (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[shortURL].longURL,
-    user: users[req.session.user_id]
+    user: usersDatabase[req.session.user_id]
   };
   // if user is not logged in, return error message
   if (!req.session.user_id) {
@@ -165,8 +174,9 @@ app.post("/urls/:id", (req, res) => {
   };
 
   const newID = req.params.id;
-  urlDatabase[newID] = req.body.newURL;
-  return res.redirect(`/urls`);
+  urlDatabase[newID].longURL = req.body.newURL;
+  console.log(urlDatabase)
+  res.redirect(`/urls`);
 });
 
 // DELETE
@@ -201,7 +211,7 @@ app.post("/urls/:id/delete", (req, res) => {
 app.get('/urls', (req, res) => {
   const templateVars = {
     urls: urlsForUser(req.session.user_id),     // updated from urls: urlsDatabase 
-    user: users[req.session.user_id]
+    user: usersDatabase[req.session.user_id]
   };
   // if user is not logged in, return error message 
   if (!req.session.user_id) {
@@ -227,7 +237,7 @@ app.post("/urls", (req, res) => {
 // GET /register endpoint which returns registration template
 app.get("/register", (req, res) => {
   const templateVars = {
-    user: users[req.session.user_id]
+    user: usersDatabase[req.session.user_id]
   };
   // if user is logged in, should redirect to GET /urls
   if (!req.session.user_id) {
@@ -251,7 +261,7 @@ app.post("/register", (req, res) => {
   };
 
   const newUserID = generateRandomString();
-  users[newUserID] = {
+  usersDatabase[newUserID] = {
     id: newUserID,
     email: enteredEmail,
     password: hashedPassword
@@ -266,7 +276,7 @@ app.post("/register", (req, res) => {
 // GET /login endpoint which returns login template
 app.get("/login", (req, res) => {
   const templateVars = {
-    user: users[req.session.user_id]
+    user: usersDatabase[req.session.user_id]
   };
   // if user is logged in, should redirect to GET /urls
   if (!req.session.user_id) {
@@ -289,7 +299,7 @@ app.post("/login", (req, res) => {
     const existingUserID = ifEmailExists(enteredEmail);
 
     //if (enteredPassword !== users[existingUserID].password) {
-    if (!bcrypt.compareSync(enteredPassword, users[existingUserID].password)) {
+    if (!bcrypt.compareSync(enteredPassword, usersDatabase[existingUserID].password)) {
       return res.status(403).send("Incorrect password");
     
     } else {
