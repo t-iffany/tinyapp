@@ -8,17 +8,21 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>        
       </div>
     </div>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
     <% if (user) { %>
       <form method="POST" action="/logout">
-        <label>Logged in as: <%= user.email %></label>
-        <button type="submit">Logout</button>
+        <label>Logged In As: <%= user.email %></label>
+        <button type="submit" class="btn btn-primary" style="border-color: black; background-color: transparent; color: black">Logout</button>
       </form>
       <% } else { %>
-        <a href="/login">Login</a>&nbsp;&nbsp;&nbsp;
-        <a href="/register">Register</a>
+        <a class="nav-item nav-link" href="/login">Login</a>
+        <a class="nav-item nav-link" href="/register">Register</a>
         <% } %>
+      </div>
+      </div>
   </nav>
 </header>
