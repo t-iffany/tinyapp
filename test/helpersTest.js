@@ -24,4 +24,10 @@ describe('getUserByEmail', function() {
     // Write your assert statement here
     assert.deepEqual(user.id, expectedOutput);
   });
+
+  it('should return undefined with non-existent email', function() {
+    const user = getUserByEmail("nonExistent@gmail.com", testUsers)
+    const expectedOutput = undefined;
+    assert.deepEqual(user, expectedOutput);
+  })
 });
