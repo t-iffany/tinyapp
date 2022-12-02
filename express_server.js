@@ -6,16 +6,14 @@ const PORT = 8080; // default port 8080
 app.set('view engine', 'ejs');
 
 // Middleware
-// takes form data and putting it into req.body
-// extended = false uses standard values ; extended = true uses non-standard values
+
 // body-parser library converts the request body from a Buffer into a readable string
 app.use(express.urlencoded({ extended: true }));
 
 // Use bcrypt to store passwords
 const bcrypt = require('bcryptjs');
 
-//cookie-parser serves as Express middleware that helps us read the values from the cookie
-//cookie-session serves as cookie-parser and also encrypts our cookies
+// cookie-session serves as cookie-parser and also encrypts our cookies
 const cookieSession = require("cookie-session");
 app.use(cookieSession({
   name: 'session',
@@ -24,18 +22,16 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
+// require helpers.js module for helper function
+const { getUserByEmail } = require('./helpers');
+
 // Implement function that returns a string of 6 random alphanumeric characters
 function generateRandomString() {
   return Math.random().toString(36).substr(2, 6);
 };
 
-
-// require helpers.js module
-const { getUserByEmail } = require('./helpers');
-
-// function which returns the URLs where the userID is equal to the id of the currently logged-in user
+// function which returns an object of userUrls where the userID is equal to the id of the currently logged-in user
 function urlsForUser(id) {
-  // userUrls will be an object that has the urls matched to the correct id
   const userUrls = {};
   for (const shortUrlId in urlDatabase) {
     if (urlDatabase[shortUrlId].userID === id) {
@@ -46,7 +42,6 @@ function urlsForUser(id) {
 };
 
 const urlDatabase = {
-  // change structure of urlDatabase so id(ie. b2xVn2) stays as key, its value becomes an object that has longURL and userID keys
   b2xVn2: {
     longURL: "http://www.lighthouselabs.ca",
     userID: "userRandomID"
@@ -73,12 +68,9 @@ const usersDatabase = {
 
 
 // ROUTES
-
 // ADD
 
-
-// 'Create New URL' Form for user to fill in
-// route to render the urls_new.ejs template to present form to the user
+// 'Create New URL' Form for user to fill in. Route to render the urls_new.ejs template to present form to the user.
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
@@ -111,12 +103,13 @@ app.get('/urls/:id', (req, res) => {
   }
   // if user do not own the URL page, it should not be accessible, return error message
   const userUrls = urlsForUser(req.session.user_id);
-  // does this object have the key of the short URL
+  // check if this object has the key of the short URL
   if (!userUrls[req.params.id]) {
     return res.send("This page does not belong to your user account");
   }
   return res.render('urls_show', templateVars);
 });
+
 
 // route to handle shortURL requests; when you click on short URL ID, you will be redirected to the longURL
 app.get("/u/:id", (req, res) => {
@@ -142,7 +135,9 @@ app.get("/hello", (req, res) => {
   return res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+
 // EDIT
+
 // POST route that updates a URL resource and have it update the value of your stored long URL
 app.post("/urls/:id", (req, res) => {
 
@@ -168,7 +163,9 @@ app.post("/urls/:id", (req, res) => {
   res.redirect(`/urls`);
 });
 
+
 // DELETE
+
 // POST route that deletes/removes a URL resource
 app.post("/urls/:id/delete", (req, res) => {
 
@@ -195,11 +192,11 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 
-// BROWSE - HOMEPAGE
+// BROWSE
 // route handler for '/urls', use res.render() to pass the URL data to our template
 app.get('/urls', (req, res) => {
   const templateVars = {
-    urls: urlsForUser(req.session.user_id),     // updated from urls: urlsDatabase 
+    urls: urlsForUser(req.session.user_id),    
     user: usersDatabase[req.session.user_id]
   };
   // if user is not logged in, return error message 
@@ -209,6 +206,7 @@ app.get('/urls', (req, res) => {
   return res.render('urls_index', templateVars);
 });
 
+
 // Takes data submitted into the form and creates new random short URL ID
 app.post("/urls", (req, res) => {
   if (!usersDatabase[req.session.user_id]) {
@@ -216,12 +214,13 @@ app.post("/urls", (req, res) => {
   };
 
   const newKey = generateRandomString();    // newKey is newly generated short URL ID
-  urlDatabase[newKey] = {        // new short URL ID now an object with values longURL and cooke with user_id
+  urlDatabase[newKey] = {        // new short URL ID now an object with values longURL and cookie with user_id
     longURL: req.body.longURL,
     userID: req.session.user_id,
   };
   return res.redirect(`/urls/${newKey}`);
 });
+
 
 // GET /register endpoint which returns registration template
 app.get("/register", (req, res) => {
@@ -234,6 +233,7 @@ app.get("/register", (req, res) => {
   }
   return res.redirect('/urls');
 });
+
 
 // POST /register endpoint to handle registration form data
 app.post("/register", (req, res) => {
@@ -273,6 +273,7 @@ app.get("/login", (req, res) => {
   return res.redirect('/urls');
 });
 
+
 // endpoint to handle a POST to /login
 app.post("/login", (req, res) => {
   const enteredEmail = req.body.email;
@@ -299,12 +300,14 @@ app.post("/login", (req, res) => {
   }
 });
 
+
 // endpoint to handle a POST to /logout
 app.post("/logout", (req, res) => {
   //res.clearCookie('user_id');
   req.session = null;
   return res.redirect('/login');
 });
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
