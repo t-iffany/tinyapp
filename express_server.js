@@ -146,12 +146,13 @@ app.post("/urls/:id", (req, res) => {
 
   // if user is not logged in
   if (!req.cookies['user_id']) {
-    return res.send('You are not logged in');
+    return res.send('You are not logged in and cannot edit');
   };
 
   // if user does not own the URL
+  const userUrls = urlsForUser(req.cookies['user_id']);
   if (!userUrls[req.params.id]) {
-    return res.send("This page does not belong to your user account");
+    return res.send("This page does not belong to your user account and you cannot edit");
   };
 
   const newID = req.params.id;
@@ -162,10 +163,29 @@ app.post("/urls/:id", (req, res) => {
 // DELETE
 // POST route that deletes/removes a URL resource
 app.post("/urls/:id/delete", (req, res) => {
+
+  // if short URL ID does not exist
+  const shortURL = req.params.id;
+  if (!urlDatabase[shortURL]) {
+    return res.send('Short URL ID does not exist');
+  };
+
+  // if user is not logged in
+  if (!req.cookies['user_id']) {
+    return res.send('You are not logged in and cannot delete');
+  };
+
+  // if logged in AND user does not own the URL
+  const userUrls = urlsForUser(req.cookies['user_id']);
+  if (!userUrls[req.params.id]) {
+    return res.send("This page does not belong to your user account and you cannot delete");
+  };
+
   const idToDelete = req.params.id;
   delete urlDatabase[idToDelete];
   return res.redirect('/urls');
 });
+
 
 // BROWSE - HOMEPAGE
 // route handler for '/urls', use res.render() to pass the URL data to our template
